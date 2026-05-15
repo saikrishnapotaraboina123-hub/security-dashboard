@@ -21,7 +21,7 @@ export default function Guards() {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  // LOAD
+  // LOAD GUARDS
   const fetchGuards = () => {
     const data = localStorage.getItem('guards');
     setGuards(data ? JSON.parse(data) : []);
@@ -40,7 +40,15 @@ export default function Guards() {
 
     if (isEditing) {
       const updated = list.map((g) =>
-        g.id === form.id ? { ...form } : g
+        g.id === form.id
+          ? {
+              ...g,
+              id: form.id,
+              name: form.name,
+              mac_address: form.mac_address,
+              mobile_number: form.mobile_number,
+            }
+          : g
       );
 
       localStorage.setItem('guards', JSON.stringify(updated));
@@ -55,7 +63,12 @@ export default function Guards() {
         return;
       }
 
-      const newGuard: SecurityGuard = { ...form };
+      const newGuard: SecurityGuard = {
+        id: form.id,
+        name: form.name,
+        mac_address: form.mac_address,
+        mobile_number: form.mobile_number,
+      };
 
       localStorage.setItem(
         'guards',
@@ -86,11 +99,17 @@ export default function Guards() {
 
   // EDIT
   const editGuard = (guard: SecurityGuard) => {
-    setForm(guard);
+    setForm({
+      id: guard.id,
+      name: guard.name,
+      mac_address: guard.mac_address,
+      mobile_number: guard.mobile_number || '',
+    });
+
     setIsEditing(true);
   };
 
-  // FILTERED DATA (SEARCH FEATURE 🔥)
+  // SEARCH FILTER
   const filteredGuards = guards.filter((g) => {
     const q = search.toLowerCase();
 
@@ -114,10 +133,10 @@ export default function Guards() {
         </p>
       </div>
 
-      {/* SEARCH BAR 🔥 */}
+      {/* SEARCH */}
       <input
         type="text"
-        placeholder="Search by ID, Name, or MAC..."
+        placeholder="Search by ID, Name, MAC..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="w-full bg-gray-900 border border-gray-800 p-3 rounded-lg text-white"
