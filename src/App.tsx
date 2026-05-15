@@ -10,6 +10,7 @@ import Architecture from './pages/Architecture';
 import Dashboard from './pages/Dashboard';
 import History from './pages/History';
 import Guards from './pages/Guards';
+
 // Placeholder Pages
 const Patrol = () => (
   <div className="text-white p-6 text-xl">
@@ -41,9 +42,7 @@ function App() {
   return (
     <div
       className={`min-h-screen transition-colors duration-300 ${
-        darkMode
-          ? 'dark bg-gray-950'
-          : 'bg-gray-100'
+        darkMode ? 'dark bg-gray-950' : 'bg-gray-100'
       }`}
     >
       <BrowserRouter>
@@ -57,16 +56,23 @@ function App() {
         <Routes>
           {/* Public Pages */}
           <Route path="/" element={<Home />} />
-          <Route path="/architecture" element={<Architecture />} />
+          <Route
+            path="/architecture"
+            element={<Architecture />}
+          />
 
-          {/* Dashboard Routes */}
+          {/* Dashboard Layout Routes */}
           <Route
             path="/dashboard"
             element={<DashboardLayout />}
           >
+            {/* default dashboard page */}
             <Route index element={<Dashboard />} />
 
-            <Route path="patrol" element={<Patrol />} />
+            <Route
+              path="patrol"
+              element={<Patrol />}
+            />
 
             <Route
               path="attendance"
@@ -86,6 +92,12 @@ function App() {
             <Route
               path="settings"
               element={<Settings />}
+            />
+
+            {/* ✅ ADDED THIS */}
+            <Route
+              path="guards"
+              element={<Guards />}
             />
           </Route>
         </Routes>
