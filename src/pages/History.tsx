@@ -1,3 +1,4 @@
+import { supabase } from '../services/supabase';
 import { useEffect, useState } from 'react';
 
 import { fetchPatrolEvents } from '../data/api';
