@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { supabase } from '../services/supabase';
 
 interface SecurityGuard {
   id: string;
@@ -21,10 +22,15 @@ export default function Guards() {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  // LOAD GUARDS
-  const fetchGuards = () => {
-    const data = localStorage.getItem('guards');
-    setGuards(data ? JSON.parse(data) : []);
+  // FETCH FROM SUPABASE
+  const fetchGuards = async () => {
+    const { data, error } = await supabase
+      .from('guards')
+      .select('*');
+
+    if (error) console.error(error);
+
+    setGuards(data || []);
   };
 
   useEffect(() => {
@@ -32,48 +38,31 @@ export default function Guards() {
   }, []);
 
   // ADD / UPDATE
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const data = localStorage.getItem('guards');
-    const list: SecurityGuard[] = data ? JSON.parse(data) : [];
-
     if (isEditing) {
-      const updated = list.map((g) =>
-        g.id === form.id
-          ? {
-              ...g,
-              id: form.id,
-              name: form.name,
-              mac_address: form.mac_address,
-              mobile_number: form.mobile_number,
-            }
-          : g
-      );
+      const { error } = await supabase
+        .from('guards')
+        .update({
+          name: form.name,
+          mac_address: form.mac_address,
+          mobile_number: form.mobile_number,
+        })
+        .eq('id', form.id);
 
-      localStorage.setItem('guards', JSON.stringify(updated));
-      setIsEditing(false);
+      if (error) console.error(error);
     } else {
-      const exists = list.find(
-        (g) => g.mac_address === form.mac_address
-      );
+      const { error } = await supabase.from('guards').insert([
+        {
+          id: form.id,
+          name: form.name,
+          mac_address: form.mac_address,
+          mobile_number: form.mobile_number,
+        },
+      ]);
 
-      if (exists) {
-        alert('MAC Address already exists!');
-        return;
-      }
-
-      const newGuard: SecurityGuard = {
-        id: form.id,
-        name: form.name,
-        mac_address: form.mac_address,
-        mobile_number: form.mobile_number,
-      };
-
-      localStorage.setItem(
-        'guards',
-        JSON.stringify([...list, newGuard])
-      );
+      if (error) console.error(error);
     }
 
     setForm({
@@ -83,17 +72,19 @@ export default function Guards() {
       mobile_number: '',
     });
 
+    setIsEditing(false);
     fetchGuards();
   };
 
   // DELETE
-  const deleteGuard = (id: string) => {
-    const data = localStorage.getItem('guards');
-    const list: SecurityGuard[] = data ? JSON.parse(data) : [];
+  const deleteGuard = async (id: string) => {
+    const { error } = await supabase
+      .from('guards')
+      .delete()
+      .eq('id', id);
 
-    const updated = list.filter((g) => g.id !== id);
+    if (error) console.error(error);
 
-    localStorage.setItem('guards', JSON.stringify(updated));
     fetchGuards();
   };
 
@@ -109,7 +100,7 @@ export default function Guards() {
     setIsEditing(true);
   };
 
-  // SEARCH FILTER
+  // SEARCH
   const filteredGuards = guards.filter((g) => {
     const q = search.toLowerCase();
 
@@ -125,30 +116,27 @@ export default function Guards() {
 
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-bold">
-          Security Guards
-        </h1>
-        <p className="text-sm text-gray-400">
-          Manage security personnel
+        <h1 className="text-2xl font-bold">Security Guards</h1>
+        <p className="text-gray-400 text-sm">
+          Cloud database powered by Supabase
         </p>
       </div>
 
       {/* SEARCH */}
       <input
-        type="text"
-        placeholder="Search by ID, Name, MAC..."
+        placeholder="Search guards..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full bg-gray-900 border border-gray-800 p-3 rounded-lg text-white"
+        className="w-full bg-gray-900 border border-gray-800 p-3 rounded"
       />
 
       {/* FORM */}
       <form
         onSubmit={handleSubmit}
-        className="grid md:grid-cols-2 gap-4 bg-gray-900 p-6 rounded-xl border border-gray-800"
+        className="grid md:grid-cols-2 gap-4 bg-gray-900 p-6 rounded-xl"
       >
         <input
-          placeholder="Guard ID"
+          placeholder="ID"
           value={form.id}
           disabled={isEditing}
           onChange={(e) =>
@@ -179,7 +167,7 @@ export default function Guards() {
         />
 
         <input
-          placeholder="Mobile (optional)"
+          placeholder="Mobile"
           value={form.mobile_number}
           onChange={(e) =>
             setForm({
@@ -192,62 +180,44 @@ export default function Guards() {
 
         <button
           type="submit"
-          className={`px-4 py-2 rounded md:col-span-2 ${
-            isEditing
-              ? 'bg-yellow-600 hover:bg-yellow-700'
-              : 'bg-blue-600 hover:bg-blue-700'
-          }`}
+          className="md:col-span-2 bg-blue-600 hover:bg-blue-700 p-3 rounded"
         >
           {isEditing ? 'Update Guard' : 'Add Guard'}
         </button>
       </form>
 
       {/* TABLE */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-
-        <div className="p-5 border-b border-gray-800">
-          <h2 className="font-semibold">
-            Registered Guards ({filteredGuards.length})
-          </h2>
-        </div>
-
+      <div className="bg-gray-900 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-800 text-gray-400">
             <tr>
-              <th className="px-6 py-3 text-left">ID</th>
-              <th className="px-6 py-3 text-left">Name</th>
-              <th className="px-6 py-3 text-left">MAC</th>
-              <th className="px-6 py-3 text-left">Mobile</th>
-              <th className="px-6 py-3 text-left">Actions</th>
+              <th className="p-3 text-left">ID</th>
+              <th className="p-3 text-left">Name</th>
+              <th className="p-3 text-left">MAC</th>
+              <th className="p-3 text-left">Mobile</th>
+              <th className="p-3 text-left">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            {filteredGuards.map((guard) => (
-              <tr
-                key={guard.id}
-                className="border-t border-gray-800"
-              >
-                <td className="px-6 py-4">{guard.id}</td>
-                <td className="px-6 py-4">{guard.name}</td>
-                <td className="px-6 py-4 font-mono text-gray-300">
-                  {guard.mac_address}
-                </td>
-                <td className="px-6 py-4 text-gray-300">
-                  {guard.mobile_number || '--'}
-                </td>
+            {filteredGuards.map((g) => (
+              <tr key={g.id} className="border-t border-gray-800">
+                <td className="p-3">{g.id}</td>
+                <td className="p-3">{g.name}</td>
+                <td className="p-3 font-mono">{g.mac_address}</td>
+                <td className="p-3">{g.mobile_number || '--'}</td>
 
-                <td className="px-6 py-4 flex gap-3">
+                <td className="p-3 flex gap-3">
                   <button
-                    onClick={() => editGuard(guard)}
-                    className="text-yellow-400 hover:text-yellow-600"
+                    onClick={() => editGuard(g)}
+                    className="text-yellow-400"
                   >
                     Edit
                   </button>
 
                   <button
-                    onClick={() => deleteGuard(guard.id)}
-                    className="text-red-400 hover:text-red-600"
+                    onClick={() => deleteGuard(g.id)}
+                    className="text-red-400"
                   >
                     Delete
                   </button>
@@ -256,7 +226,6 @@ export default function Guards() {
             ))}
           </tbody>
         </table>
-
       </div>
     </div>
   );
