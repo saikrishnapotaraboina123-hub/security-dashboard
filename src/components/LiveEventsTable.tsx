@@ -28,7 +28,7 @@ export default function LiveEventsTable({
           <thead className="bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs text-gray-400">
-                Time
+                Timestamp
               </th>
 
               <th className="px-6 py-3 text-left text-xs text-gray-400">
@@ -40,7 +40,11 @@ export default function LiveEventsTable({
               </th>
 
               <th className="px-6 py-3 text-left text-xs text-gray-400">
-                RSSI
+                Signal
+              </th>
+
+              <th className="px-6 py-3 text-left text-xs text-gray-400">
+                Battery
               </th>
             </tr>
           </thead>
@@ -49,43 +53,69 @@ export default function LiveEventsTable({
             {loading ? (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={5}
                   className="text-center py-10 text-gray-500"
                 >
                   Loading...
                 </td>
               </tr>
-            ) : (
-              events.map((event) => (
-                <tr
-                  key={event.id}
-                  className="border-t border-gray-800"
+            ) : events.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="text-center py-10 text-gray-500"
                 >
-                  <td className="px-6 py-4 text-sm text-gray-300">
-                    {formatTime(
-                      event.timestamp_utc
-                    )}
-                  </td>
+                  No events found
+                </td>
+              </tr>
+            ) : (
+              events.map((event) => {
+                const anchor =
+                  anchors.find(
+                    (a) =>
+                      a.id ===
+                      event.anchor_id
+                  );
 
-                  <td className="px-6 py-4 text-sm text-white">
-                    {event.anchor_id}
-                  </td>
+                return (
+                  <tr
+                    key={event.id}
+                    className="border-t border-gray-800 hover:bg-gray-800/40"
+                  >
+                    <td className="px-6 py-4 text-sm text-gray-300">
+                      {formatTime(
+                        event.timestamp_utc
+                      )}
+                    </td>
 
-                  <td className="px-6 py-4 text-sm text-white">
-                    {event.tag_id}
-                  </td>
+                    <td className="px-6 py-4 text-sm text-white">
+                      {anchor?.name ||
+                        event.anchor_id}
+                    </td>
 
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 rounded text-xs text-white ${getRSSIColor(
-                        event.rssi
-                      )}`}
-                    >
-                      {event.rssi}
-                    </span>
-                  </td>
-                </tr>
-              ))
+                    <td className="px-6 py-4 text-sm text-white">
+                      {event.tag_id}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2 py-1 rounded text-xs text-white ${getRSSIColor(
+                          event.rssi
+                        )}`}
+                      >
+                        {event.rssi} dBm
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-4 text-sm text-gray-400">
+                      {event.battery !==
+                      null
+                        ? `${event.battery}%`
+                        : 'N/A'}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
