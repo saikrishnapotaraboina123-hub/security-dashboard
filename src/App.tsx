@@ -9,7 +9,7 @@ import Home from './pages/Home';
 import Architecture from './pages/Architecture';
 import Dashboard from './pages/Dashboard';
 import History from './pages/History';
-
+import Guards from './pages/Guards';
 // Placeholder Pages
 const Patrol = () => (
   <div className="text-white p-6 text-xl">
