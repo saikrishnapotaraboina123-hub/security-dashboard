@@ -10,6 +10,9 @@ import Dashboard from './pages/Dashboard';
 import History from './pages/History';
 import Guards from './pages/Guards';
 
+// 🔥 NEW PAGES (we are preparing for next steps)
+import PatrolMapPage from './pages/PatrolMapPage';
+
 const Patrol = () => (
   <div className="text-white p-6">Live Patrol — coming soon</div>
 );
@@ -30,29 +33,48 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(true);
 
   return (
-    <div className={darkMode ? 'dark bg-gray-950' : 'bg-gray-100'}>
+    <div className={darkMode ? 'dark bg-gray-950 min-h-screen' : 'bg-gray-100 min-h-screen'}>
+
       <BrowserRouter>
+
         <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
 
         <Routes>
-          {/* public */}
+
+          {/* ======================
+              PUBLIC ROUTES
+          ====================== */}
           <Route path="/" element={<Home />} />
           <Route path="/architecture" element={<Architecture />} />
 
-          {/* dashboard layout */}
+          {/* ======================
+              DASHBOARD ROUTES
+          ====================== */}
           <Route path="/dashboard" element={<DashboardLayout />}>
+
             <Route index element={<Dashboard />} />
+
             <Route path="patrol" element={<Patrol />} />
             <Route path="attendance" element={<Attendance />} />
             <Route path="analytics" element={<Analytics />} />
+
+            {/* LIVE HISTORY */}
             <Route path="history" element={<History />} />
+
+            {/* GUARDS */}
+            <Route path="guards" element={<Guards />} />
+
+            {/* 🔥 NEW: LIVE MAP TRACKING */}
+            <Route path="map" element={<PatrolMapPage />} />
+
             <Route path="settings" element={<Settings />} />
 
-            {/* ✅ THIS MUST EXIST */}
-            <Route path="guards" element={<Guards />} />
           </Route>
+
         </Routes>
+
       </BrowserRouter>
+
     </div>
   );
 }
