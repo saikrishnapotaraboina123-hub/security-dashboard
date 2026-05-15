@@ -28,3 +28,10 @@ export interface AttendanceRecord {
   check_out?: string;
   status: string;
 }
+export interface SecurityGuard {
+  id: string;
+  name: string;
+  mac_address: string;
+  mobile_number?: string;
+  created_at?: string;
+}
