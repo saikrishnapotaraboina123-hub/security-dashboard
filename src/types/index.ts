@@ -46,6 +46,7 @@ export interface PatrolEvent {
   rssi: number;
 
   esp32_location: string;
+  status?: GuardStatus;
 }
 
 // ==========================================
