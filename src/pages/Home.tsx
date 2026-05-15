@@ -1,332 +1,161 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import {
-  Shield,
-  Bluetooth,
-  Server,
-  Globe,
-  Rocket,
-  Wifi,
-  Database,
-  MapPin,
-  Download,
-  ChevronRight,
-  Terminal,
-  Container,
-  TestTube,
-  Cpu,
-} from 'lucide-react';
-
-import FeatureCard from '../components/FeatureCard';
 
 export default function Home() {
-  const features = [
-    {
-      icon: Bluetooth,
-      title: 'ESP32 BLE Scanner',
-      description:
-        'PlatformIO firmware scanning BLE advertisements with tag filtering, RSSI extraction, and battery reading',
-      color: 'from-blue-500 to-cyan-500',
-    },
-    {
-      icon: Server,
-      title: 'FastAPI Backend',
-      description:
-        'Python REST API with SQLAlchemy models, Pydantic validation, API key auth, CORS, SQLite/Postgres support',
-      color: 'from-green-500 to-emerald-500',
-    },
-    {
-      icon: Globe,
-      title: 'Web Dashboard',
-      description:
-        'Jinja2 templates + Leaflet maps showing real-time patrol events, filters, CSV export',
-      color: 'from-purple-500 to-pink-500',
-    },
-    {
-      icon: Container,
-      title: 'Docker Ready',
-      description:
-        'One-command docker-compose setup with seed scripts, health checks, volume persistence',
-      color: 'from-orange-500 to-red-500',
-    },
-    {
-      icon: Database,
-      title: 'Data Persistence',
-      description:
-        'SQLite for development, PostgreSQL-ready for production. Full CRUD on anchors, tags, events',
-      color: 'from-indigo-500 to-violet-500',
-    },
-    {
-      icon: Download,
-      title: 'Export & Reports',
-      description:
-        'CSV export with date/tag/anchor filters. Includes lat/lon when anchor positions configured',
-      color: 'from-teal-500 to-cyan-500',
-    },
-  ];
-
-  const quickLinks = [
-    {
-      icon: Cpu,
-      label: 'ESP32 Firmware',
-      desc: 'PlatformIO + Arduino',
-      path: '/firmware',
-      color: 'text-blue-500',
-    },
-    {
-      icon: Server,
-      label: 'FastAPI Backend',
-      desc: 'Python + SQLAlchemy',
-      path: '/backend',
-      color: 'text-green-500',
-    },
-    {
-      icon: Globe,
-      label: 'Web Frontend',
-      desc: 'Jinja2 + Leaflet',
-      path: '/frontend',
-      color: 'text-purple-500',
-    },
-    {
-      icon: MapPin,
-      label: 'Live Demo',
-      desc: 'Interactive Dashboard',
-      path: '/dashboard',
-      color: 'text-orange-500',
-    },
-    {
-      icon: Container,
-      label: 'Docker Setup',
-      desc: 'docker-compose',
-      path: '/devops',
-      color: 'text-cyan-500',
-    },
-    {
-      icon: TestTube,
-      label: 'Test Plan',
-      desc: 'curl + ESP32 tests',
-      path: '/testing',
-      color: 'text-pink-500',
-    },
-  ];
-
   return (
-    <div className="relative">
-      {/* HERO SECTION */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-accent-800" />
+    <div className="min-h-screen bg-white dark:bg-gray-950 overflow-hidden">
+      
+      {/* Background Glow */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-0 left-1/2 w-[600px] h-[600px] bg-primary-500/10 blur-3xl rounded-full -translate-x-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-accent-500/10 blur-3xl rounded-full"></div>
+      </div>
 
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width=%2260%22%20height=%2260%22%20viewBox=%220%200%2060%2060%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg%20fill=%22none%22%20fill-rule=%22evenodd%22%3E%3Cg%20fill=%22%23ffffff%22%20fill-opacity=%220.05%22%3E%3Ccircle%20cx=%2230%22%20cy=%2230%22%20r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />
+      {/* Hero Section */}
+      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28">
+        <motion.div
+          initial={{ opacity: 0, y: 35 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="text-center"
+        >
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 mb-8">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span className="text-sm font-medium text-primary-700 dark:text-primary-300">
+              Live Security Monitoring System
+            </span>
+          </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+          {/* Main Heading */}
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight">
+            Security Patrol
+            <span className="block bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
+              Dashboard
+            </span>
+          </h1>
+
+          {/* Description */}
+          <p className="mt-8 max-w-3xl mx-auto text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+            Real-time BLE-based security guard tracking platform with
+            checkpoint verification, attendance monitoring, patrol analytics,
+            live location updates, and event management.
+          </p>
+
+          {/* Buttons */}
+          <div className="mt-12 flex flex-wrap justify-center gap-4">
+            <a
+              href="/dashboard"
+              className="px-7 py-3.5 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-semibold shadow-lg shadow-primary-500/20 transition-all duration-300"
+            >
+              Open Dashboard
+            </a>
+
+            <a
+              href="/architecture"
+              className="px-7 py-3.5 rounded-2xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-semibold transition-all duration-300"
+            >
+              View Architecture
+            </a>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Feature Highlights */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div className="grid md:grid-cols-3 gap-6">
+          
+          {/* Card 1 */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+            transition={{ delay: 0.1 }}
+            className="p-6 rounded-3xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm mb-6 border border-white/20">
-              <Shield className="w-4 h-4" />
-              <span>
-                IoT Starter Project • ESP32 + FastAPI + Web Dashboard
-              </span>
+            <div className="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-5">
+              <svg
+                className="w-7 h-7 text-blue-600 dark:text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M9 17v-6h13v6"></path>
+                <path d="M13 7V3H2v14h7"></path>
+              </svg>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-              Security Patrol
-              <div className="text-2xl sm:text-3xl lg:text-4xl mt-2 text-primary-200 font-normal">
-                BLE-Based Guard Tour System
-              </div>
-            </h1>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+              Live Patrol Tracking
+            </h3>
 
-            <p className="max-w-2xl mx-auto text-lg text-blue-100 mb-10 leading-relaxed">
-              Complete IoT starter kit for building security patrol monitoring
-              systems. ESP32 anchors scan BLE tags, report to FastAPI backend,
-              visualize in real-time dashboard.
+            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+              Monitor security guards in real time using BLE checkpoints and
+              anchor devices deployed across patrol areas.
             </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link
-                to="/architecture"
-                className="group inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-700 font-semibold rounded-xl hover:bg-primary-50 transition-all shadow-lg shadow-black/20"
-              >
-                <Rocket className="w-5 h-5" />
-                Explore Architecture
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-
-              <Link
-                to="/dashboard"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all"
-              >
-                <MapPin className="w-5 h-5" />
-                View Live Demo
-              </Link>
-            </div>
           </motion.div>
-        </div>
 
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg
-            viewBox="0 0 1440 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-              fill="currentColor"
-              className="text-gray-50 dark:text-gray-950"
-            />
-          </svg>
-        </div>
-      </section>
-
-      {/* QUICK LINKS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {quickLinks.map((link, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + i * 0.05 }}
-            >
-              <Link
-                to={link.path}
-                className="block p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-lg transition-all group"
-              >
-                <link.icon className={`w-6 h-6 ${link.color} mb-2`} />
-
-                <div className="font-semibold text-gray-900 dark:text-white text-sm">
-                  {link.label}
-                </div>
-
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {link.desc}
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Everything You Need
-          </h2>
-
-          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            A production-ready starter with firmware, backend, frontend, and
-            DevOps tooling included.
-          </p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((f, i) => (
-            <FeatureCard key={i} {...f} delay={i * 0.1} />
-          ))}
-        </div>
-      </section>
-
-      {/* TECH STACK */}
-      <section className="bg-gray-100 dark:bg-gray-900/50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Card 2 */}
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="p-6 rounded-3xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm"
           >
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Tech Stack
-            </h2>
+            <div className="w-14 h-14 rounded-2xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-5">
+              <svg
+                className="w-7 h-7 text-green-600 dark:text-green-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M9 12l2 2 4-4"></path>
+                <path d="M21 12c0 1.66-.67 3.16-1.76 4.24A5.98 5.98 0 0112 21a5.98 5.98 0 01-7.24-4.76A5.98 5.98 0 013 12c0-1.66.67-3.16 1.76-4.24A5.98 5.98 0 0112 3a5.98 5.98 0 017.24 4.76A5.98 5.98 0 0121 12z"></path>
+              </svg>
+            </div>
 
-            <p className="text-gray-600 dark:text-gray-400">
-              Built with proven, well-documented technologies
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+              Attendance & Checkpoints
+            </h3>
+
+            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+              Automatically verify guard attendance and patrol completion with
+              timestamped checkpoint events.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {[
-              { name: 'ESP32', icon: Wifi, color: 'bg-red-500' },
-              { name: 'PlatformIO', icon: Terminal, color: 'bg-blue-500' },
-              { name: 'BLE', icon: Bluetooth, color: 'bg-blue-400' },
-              { name: 'FastAPI', icon: Server, color: 'bg-teal-500' },
-              { name: 'SQLAlchemy', icon: Database, color: 'bg-red-600' },
-              {
-                name: 'Jinja2',
-                icon: Globe,
-                color: 'bg-black dark:bg-white',
-              },
-              { name: 'Leaflet', icon: MapPin, color: 'bg-green-500' },
-              { name: 'Docker', icon: Container, color: 'bg-blue-600' },
-              { name: 'NTP', icon: Terminal, color: 'bg-purple-500' },
-              { name: 'LittleFS', icon: Database, color: 'bg-yellow-500' },
-              { name: 'Pydantic', icon: Terminal, color: 'bg-red-500' },
-              { name: 'HTTPS', icon: Shield, color: 'bg-green-600' },
-            ].map((t, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="flex flex-col items-center gap-2 p-4"
+          {/* Card 3 */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="p-6 rounded-3xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-5">
+              <svg
+                className="w-7 h-7 text-purple-600 dark:text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
               >
-                <div
-                  className={`w-12 h-12 ${t.color} rounded-xl flex items-center justify-center shadow-lg`}
-                >
-                  <t.icon className="w-6 h-6 text-white" />
-                </div>
+                <path d="M3 3v18h18"></path>
+                <path d="M18 17V9"></path>
+                <path d="M13 17V5"></path>
+                <path d="M8 17v-3"></path>
+              </svg>
+            </div>
 
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t.name}
-                </span>
-              </motion.div>
-            ))}
-          </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+              Analytics & Reports
+            </h3>
+
+            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+              Generate patrol reports, analyze checkpoint history, and monitor
+              security performance through visual dashboards.
+            </p>
+          </motion.div>
         </div>
-      </section>
-
-      {/* CTA */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center p-12 bg-gradient-to-br from-primary-600 to-accent-700 rounded-3xl"
-        >
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Build?
-          </h2>
-
-          <p className="text-blue-100 mb-8 max-w-xl mx-auto">
-            Start with the Architecture overview, then dive into each
-            component&apos;s complete source code.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              to="/architecture"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-700 font-semibold rounded-xl hover:bg-primary-50 transition-all"
-            >
-              View Architecture Diagram →
-            </Link>
-
-            <Link
-              to="/firmware"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all"
-            >
-              Browse Source Code →
-            </Link>
-          </div>
-        </motion.div>
       </section>
     </div>
   );
