@@ -1,58 +1,37 @@
-import {
-  Outlet,
-  Link,
-  useLocation,
-} from 'react-router-dom';
+import { Link, useLocation, Outlet } from 'react-router-dom';
 
 export default function DashboardLayout() {
   const location = useLocation();
 
-  const menuItems = [
-    {
-      name: 'Dashboard',
-      path: '/dashboard',
-    },
-    {
-      name: 'Patrol',
-      path: '/dashboard/patrol',
-    },
-    {
-      name: 'Attendance',
-      path: '/dashboard/attendance',
-    },
-    {
-      name: 'Analytics',
-      path: '/dashboard/analytics',
-    },
-    {
-      name: 'History',
-      path: '/dashboard/history',
-    },
-    {
-      name: 'Settings',
-      path: '/dashboard/settings',
-    },
+  const menu = [
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Patrol', path: '/dashboard/patrol' },
+    { name: 'Attendance', path: '/dashboard/attendance' },
+    { name: 'Analytics', path: '/dashboard/analytics' },
+    { name: 'History', path: '/dashboard/history' },
+    { name: 'Guards', path: '/dashboard/guards' },
+    { name: 'Settings', path: '/dashboard/settings' },
   ];
 
   return (
     <div className="flex min-h-screen bg-gray-950 text-white">
       {/* Sidebar */}
       <aside className="w-64 bg-gray-900 border-r border-gray-800 p-5">
-        <h2 className="text-2xl font-bold mb-8">
-          Dashboard
-        </h2>
+        <h1 className="text-2xl font-bold mb-6">
+          Security Panel
+        </h1>
 
         <nav className="space-y-2">
-          {menuItems.map((item) => {
-            const active =
+          {menu.map((item) => {
+            const isActive =
               location.pathname === item.path;
 
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`block px-4 py-3 rounded-lg transition ${
-                  active
+                className={`block px-4 py-2 rounded-lg transition ${
+                  isActive
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                 }`}
@@ -64,8 +43,8 @@ export default function DashboardLayout() {
         </nav>
       </aside>
 
-      {/* Main */}
-      <main className="flex-1 p-6">
+      {/* Main content */}
+      <main className="flex-1 p-6 overflow-auto">
         <Outlet />
       </main>
     </div>
