@@ -1,4 +1,3 @@
-
 import { supabase } from '../services/supabase';
 
 import type {
@@ -24,7 +23,7 @@ export async function fetchGuards(): Promise<SecurityGuard[]> {
 }
 
 // =======================================
-// FETCH PATROL EVENTS
+// FETCH PATROL EVENTS (FIXED + SAFE)
 // =======================================
 export async function fetchPatrolEvents(): Promise<PatrolEvent[]> {
   const { data, error } = await supabase
@@ -37,5 +36,19 @@ export async function fetchPatrolEvents(): Promise<PatrolEvent[]> {
     return [];
   }
 
-  return data || [];
+  // ✅ SAFE MAPPING (THIS FIXES YOUR ERRORS)
+  return (data || []).map((item: any) => ({
+    id: item.id,
+
+    guardName: item.guard_name ?? item.guardName ?? 'Unknown',
+    guardId: item.guard_id ?? item.guardId ?? 'N/A',
+
+    checkpoint: item.checkpoint ?? 'Unknown',
+
+    time: item.created_at ?? item.time ?? '',
+
+    rssi: item.rssi ?? 0,
+
+    status: item.status ?? 'offline',
+  }));
 }
