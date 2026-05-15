@@ -10,6 +10,8 @@ interface SecurityGuard {
 export default function Guards() {
   const [guards, setGuards] = useState<SecurityGuard[]>([]);
 
+  const [search, setSearch] = useState('');
+
   const [form, setForm] = useState({
     id: '',
     name: '',
@@ -19,7 +21,7 @@ export default function Guards() {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  // LOAD DATA
+  // LOAD
   const fetchGuards = () => {
     const data = localStorage.getItem('guards');
     setGuards(data ? JSON.parse(data) : []);
@@ -29,7 +31,7 @@ export default function Guards() {
     fetchGuards();
   }, []);
 
-  // ADD / UPDATE GUARD
+  // ADD / UPDATE
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -37,20 +39,13 @@ export default function Guards() {
     const list: SecurityGuard[] = data ? JSON.parse(data) : [];
 
     if (isEditing) {
-      // UPDATE MODE
       const updated = list.map((g) =>
         g.id === form.id ? { ...form } : g
       );
 
-      localStorage.setItem(
-        'guards',
-        JSON.stringify(updated)
-      );
-
+      localStorage.setItem('guards', JSON.stringify(updated));
       setIsEditing(false);
     } else {
-      // ADD MODE
-
       const exists = list.find(
         (g) => g.mac_address === form.mac_address
       );
@@ -60,12 +55,7 @@ export default function Guards() {
         return;
       }
 
-      const newGuard: SecurityGuard = {
-        id: form.id,
-        name: form.name,
-        mac_address: form.mac_address,
-        mobile_number: form.mobile_number,
-      };
+      const newGuard: SecurityGuard = { ...form };
 
       localStorage.setItem(
         'guards',
@@ -91,21 +81,25 @@ export default function Guards() {
     const updated = list.filter((g) => g.id !== id);
 
     localStorage.setItem('guards', JSON.stringify(updated));
-
     fetchGuards();
   };
 
-  // EDIT (load into form)
+  // EDIT
   const editGuard = (guard: SecurityGuard) => {
-    setForm({
-      id: guard.id,
-      name: guard.name,
-      mac_address: guard.mac_address,
-      mobile_number: guard.mobile_number || '',
-    });
-
+    setForm(guard);
     setIsEditing(true);
   };
+
+  // FILTERED DATA (SEARCH FEATURE 🔥)
+  const filteredGuards = guards.filter((g) => {
+    const q = search.toLowerCase();
+
+    return (
+      g.id.toLowerCase().includes(q) ||
+      g.name.toLowerCase().includes(q) ||
+      g.mac_address.toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="space-y-6 text-white">
@@ -120,6 +114,15 @@ export default function Guards() {
         </p>
       </div>
 
+      {/* SEARCH BAR 🔥 */}
+      <input
+        type="text"
+        placeholder="Search by ID, Name, or MAC..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full bg-gray-900 border border-gray-800 p-3 rounded-lg text-white"
+      />
+
       {/* FORM */}
       <form
         onSubmit={handleSubmit}
@@ -128,7 +131,7 @@ export default function Guards() {
         <input
           placeholder="Guard ID"
           value={form.id}
-          disabled={isEditing} // ID locked while editing
+          disabled={isEditing}
           onChange={(e) =>
             setForm({ ...form, id: e.target.value })
           }
@@ -182,9 +185,10 @@ export default function Guards() {
 
       {/* TABLE */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+
         <div className="p-5 border-b border-gray-800">
           <h2 className="font-semibold">
-            Registered Guards
+            Registered Guards ({filteredGuards.length})
           </h2>
         </div>
 
@@ -200,7 +204,7 @@ export default function Guards() {
           </thead>
 
           <tbody>
-            {guards.map((guard) => (
+            {filteredGuards.map((guard) => (
               <tr
                 key={guard.id}
                 className="border-t border-gray-800"
@@ -223,9 +227,7 @@ export default function Guards() {
                   </button>
 
                   <button
-                    onClick={() =>
-                      deleteGuard(guard.id)
-                    }
+                    onClick={() => deleteGuard(guard.id)}
                     className="text-red-400 hover:text-red-600"
                   >
                     Delete
@@ -235,6 +237,7 @@ export default function Guards() {
             ))}
           </tbody>
         </table>
+
       </div>
     </div>
   );
