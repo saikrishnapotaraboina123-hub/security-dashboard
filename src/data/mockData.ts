@@ -1,40 +1,60 @@
 import { supabase } from '../services/supabase';
-import type { Guard, PatrolEvent } from '../types';
+
+import type {
+  SecurityGuard,
+  PatrolEvent,
+} from '../types';
 
 // =======================================
 // FETCH GUARDS
 // =======================================
-export async function fetchGuards(): Promise<Guard[]> {
+export async function fetchGuards():
+Promise<SecurityGuard[]> {
 
-  const { data, error } = await supabase
+  const {
+    data,
+    error
+  } = await supabase
+
     .from('guards')
-    .select('*');
+
+    .select('*')
+
+    .order('id', {
+      ascending: true
+    });
 
   if (error) {
 
-    console.error('Error fetching guards:', error);
+    console.error(
+      'Error fetching guards:',
+      error
+    );
 
     return [];
   }
 
-  return data.map((guard: any) => ({
-    id: guard.id,
-    name: guard.name,
-    status: 'active',
-    checkpoint: 'Unknown',
-    lastSeen: 'Just now'
-  }));
+  return data || [];
 }
 
 // =======================================
 // FETCH PATROL EVENTS
 // =======================================
-export async function fetchPatrolEvents(): Promise<PatrolEvent[]> {
+export async function fetchPatrolEvents():
+Promise<PatrolEvent[]> {
 
-  const { data, error } = await supabase
+  const {
+    data,
+    error
+  } = await supabase
+
     .from('patrol_logs')
+
     .select('*')
-    .order('created_at', { ascending: false });
+
+    .order('created_at', {
+      ascending: false
+    });
 
   if (error) {
 
@@ -46,22 +66,5 @@ export async function fetchPatrolEvents(): Promise<PatrolEvent[]> {
     return [];
   }
 
-  return data.map((event: any, index: number) => ({
-    id: event.id || `event-${index}`,
-    guardId: event.mac_address,
-    guardName: event.device_name || 'Unknown',
-    checkpoint: event.esp32_location || 'Unknown',
-    time: new Date(
-      event.created_at
-    ).toLocaleTimeString(),
-
-    rssi: event.rssi,
-
-    status:
-      event.rssi > -70
-        ? 'active'
-        : event.rssi > -85
-        ? 'delayed'
-        : 'offline'
-  }));
+  return data || [];
 }
