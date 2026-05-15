@@ -1,4 +1,8 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import {
+  Outlet,
+  Link,
+  useLocation,
+} from 'react-router-dom';
 
 export default function DashboardLayout() {
   const location = useLocation();
@@ -60,7 +64,7 @@ export default function DashboardLayout() {
         </nav>
       </aside>
 
-      {/* Page Content */}
+      {/* Main */}
       <main className="flex-1 p-6">
         <Outlet />
       </main>
