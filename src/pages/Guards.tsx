@@ -17,7 +17,9 @@ export default function Guards() {
     mobile_number: '',
   });
 
-  // Load guards from localStorage
+  const [isEditing, setIsEditing] = useState(false);
+
+  // LOAD DATA
   const fetchGuards = () => {
     const data = localStorage.getItem('guards');
     setGuards(data ? JSON.parse(data) : []);
@@ -27,33 +29,49 @@ export default function Guards() {
     fetchGuards();
   }, []);
 
-  // ADD GUARD
+  // ADD / UPDATE GUARD
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const data = localStorage.getItem('guards');
     const list: SecurityGuard[] = data ? JSON.parse(data) : [];
 
-    // prevent duplicate MAC
-    const exists = list.find(
-      (g) => g.mac_address === form.mac_address
-    );
+    if (isEditing) {
+      // UPDATE MODE
+      const updated = list.map((g) =>
+        g.id === form.id ? { ...form } : g
+      );
 
-    if (exists) {
-      alert('MAC Address already exists!');
-      return;
+      localStorage.setItem(
+        'guards',
+        JSON.stringify(updated)
+      );
+
+      setIsEditing(false);
+    } else {
+      // ADD MODE
+
+      const exists = list.find(
+        (g) => g.mac_address === form.mac_address
+      );
+
+      if (exists) {
+        alert('MAC Address already exists!');
+        return;
+      }
+
+      const newGuard: SecurityGuard = {
+        id: form.id,
+        name: form.name,
+        mac_address: form.mac_address,
+        mobile_number: form.mobile_number,
+      };
+
+      localStorage.setItem(
+        'guards',
+        JSON.stringify([...list, newGuard])
+      );
     }
-
-    const newGuard: SecurityGuard = {
-      id: form.id,
-      name: form.name,
-      mac_address: form.mac_address,
-      mobile_number: form.mobile_number,
-    };
-
-    const updated = [...list, newGuard];
-
-    localStorage.setItem('guards', JSON.stringify(updated));
 
     setForm({
       id: '',
@@ -65,7 +83,7 @@ export default function Guards() {
     fetchGuards();
   };
 
-  // DELETE GUARD
+  // DELETE
   const deleteGuard = (id: string) => {
     const data = localStorage.getItem('guards');
     const list: SecurityGuard[] = data ? JSON.parse(data) : [];
@@ -77,8 +95,21 @@ export default function Guards() {
     fetchGuards();
   };
 
+  // EDIT (load into form)
+  const editGuard = (guard: SecurityGuard) => {
+    setForm({
+      id: guard.id,
+      name: guard.name,
+      mac_address: guard.mac_address,
+      mobile_number: guard.mobile_number || '',
+    });
+
+    setIsEditing(true);
+  };
+
   return (
     <div className="space-y-6 text-white">
+
       {/* HEADER */}
       <div>
         <h1 className="text-2xl font-bold">
@@ -97,11 +128,11 @@ export default function Guards() {
         <input
           placeholder="Guard ID"
           value={form.id}
+          disabled={isEditing} // ID locked while editing
           onChange={(e) =>
             setForm({ ...form, id: e.target.value })
           }
-          className="bg-gray-800 p-3 rounded text-white"
-          required
+          className="bg-gray-800 p-3 rounded"
         />
 
         <input
@@ -110,8 +141,7 @@ export default function Guards() {
           onChange={(e) =>
             setForm({ ...form, name: e.target.value })
           }
-          className="bg-gray-800 p-3 rounded text-white"
-          required
+          className="bg-gray-800 p-3 rounded"
         />
 
         <input
@@ -123,8 +153,7 @@ export default function Guards() {
               mac_address: e.target.value,
             })
           }
-          className="bg-gray-800 p-3 rounded text-white"
-          required
+          className="bg-gray-800 p-3 rounded"
         />
 
         <input
@@ -136,14 +165,18 @@ export default function Guards() {
               mobile_number: e.target.value,
             })
           }
-          className="bg-gray-800 p-3 rounded text-white"
+          className="bg-gray-800 p-3 rounded"
         />
 
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded md:col-span-2"
+          className={`px-4 py-2 rounded md:col-span-2 ${
+            isEditing
+              ? 'bg-yellow-600 hover:bg-yellow-700'
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
         >
-          Add Guard
+          {isEditing ? 'Update Guard' : 'Add Guard'}
         </button>
       </form>
 
@@ -158,17 +191,11 @@ export default function Guards() {
         <table className="w-full text-sm">
           <thead className="bg-gray-800 text-gray-400">
             <tr>
-              <th className="text-left px-6 py-3">ID</th>
-              <th className="text-left px-6 py-3">Name</th>
-              <th className="text-left px-6 py-3">
-                MAC Address
-              </th>
-              <th className="text-left px-6 py-3">
-                Mobile
-              </th>
-              <th className="text-left px-6 py-3">
-                Actions
-              </th>
+              <th className="px-6 py-3 text-left">ID</th>
+              <th className="px-6 py-3 text-left">Name</th>
+              <th className="px-6 py-3 text-left">MAC</th>
+              <th className="px-6 py-3 text-left">Mobile</th>
+              <th className="px-6 py-3 text-left">Actions</th>
             </tr>
           </thead>
 
@@ -178,24 +205,23 @@ export default function Guards() {
                 key={guard.id}
                 className="border-t border-gray-800"
               >
-                <td className="px-6 py-4">
-                  {guard.id}
-                </td>
-
-                <td className="px-6 py-4">
-                  {guard.name}
-                </td>
-
+                <td className="px-6 py-4">{guard.id}</td>
+                <td className="px-6 py-4">{guard.name}</td>
                 <td className="px-6 py-4 font-mono text-gray-300">
                   {guard.mac_address}
                 </td>
-
                 <td className="px-6 py-4 text-gray-300">
                   {guard.mobile_number || '--'}
                 </td>
 
-                {/* DELETE BUTTON */}
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 flex gap-3">
+                  <button
+                    onClick={() => editGuard(guard)}
+                    className="text-yellow-400 hover:text-yellow-600"
+                  >
+                    Edit
+                  </button>
+
                   <button
                     onClick={() =>
                       deleteGuard(guard.id)
