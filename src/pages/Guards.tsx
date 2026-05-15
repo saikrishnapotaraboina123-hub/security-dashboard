@@ -1,216 +1,435 @@
 import { useEffect, useState } from 'react';
+
 import {
   fetchGuards,
   addGuard,
   updateGuard,
   deleteGuard,
 } from '../services/supabase';
-import type { SecurityGuard } from '../types';
+
+import type {
+  SecurityGuard,
+} from '../types';
+
+import {
+  Plus,
+  Trash2,
+  Pencil,
+  Save,
+  X,
+} from 'lucide-react';
 
 export default function Guards() {
-  const [guards, setGuards] = useState<SecurityGuard[]>([]);
-  const [search, setSearch] = useState('');
 
-  const [form, setForm] = useState({
-    id: '',
-    name: '',
-    mac_address: '',
-    mobile_number: '',
-  });
+  // ======================================
+  // STATES
+  // ======================================
+  const [guards, setGuards] = useState<
+    SecurityGuard[]
+  >([]);
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] =
+    useState(true);
 
-  // Load all guards from Supabase
+  const [editingId, setEditingId] =
+    useState<string | null>(null);
+
+  const [formData, setFormData] =
+    useState<SecurityGuard>({
+      id: '',
+      name: '',
+      mac_address: '',
+      mobile_number: '',
+    });
+
+  // ======================================
+  // LOAD GUARDS
+  // ======================================
   const loadGuards = async () => {
+
     try {
-      const data = await fetchGuards();
+
+      const data =
+        await fetchGuards();
+
       setGuards(data);
-    } catch (err) {
-      console.error('Error fetching guards:', err);
+
+    } catch (error) {
+
+      console.error(error);
+
+    } finally {
+
+      setLoading(false);
     }
   };
 
   useEffect(() => {
+
     loadGuards();
+
   }, []);
 
-  // Add or Update guard
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // ======================================
+  // HANDLE INPUT
+  // ======================================
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement
+    >
+  ) => {
+
+    setFormData({
+      ...formData,
+      [e.target.name]:
+        e.target.value,
+    });
+  };
+
+  // ======================================
+  // ADD GUARD
+  // ======================================
+  const handleAdd = async () => {
 
     try {
-      if (isEditing) {
-        await updateGuard(form);
-        setIsEditing(false);
-      } else {
-        await addGuard(form);
-      }
 
-      setForm({
+      await addGuard(formData);
+
+      setFormData({
         id: '',
         name: '',
         mac_address: '',
         mobile_number: '',
       });
 
-      await loadGuards();
-    } catch (err) {
-      console.error('Error saving guard:', err);
-      alert('Something went wrong. Check console.');
+      loadGuards();
+
+    } catch (error) {
+
+      console.error(error);
     }
   };
 
-  // Delete guard
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this guard?')) return;
+  // ======================================
+  // EDIT
+  // ======================================
+  const handleEdit = (
+    guard: SecurityGuard
+  ) => {
+
+    setEditingId(guard.id);
+
+    setFormData(guard);
+  };
+
+  // ======================================
+  // UPDATE
+  // ======================================
+  const handleUpdate = async () => {
 
     try {
-      await deleteGuard(id);
-      await loadGuards();
-    } catch (err) {
-      console.error('Error deleting guard:', err);
+
+      await updateGuard(formData);
+
+      setEditingId(null);
+
+      setFormData({
+        id: '',
+        name: '',
+        mac_address: '',
+        mobile_number: '',
+      });
+
+      loadGuards();
+
+    } catch (error) {
+
+      console.error(error);
     }
   };
 
-  // Edit guard (load data into form)
-  const handleEdit = (guard: SecurityGuard) => {
-    setForm({
-      id: guard.id,
-      name: guard.name,
-      mac_address: guard.mac_address,
-      mobile_number: guard.mobile_number || '',
-    });
-    setIsEditing(true);
+  // ======================================
+  // DELETE
+  // ======================================
+  const handleDelete = async (
+    id: string
+  ) => {
+
+    const confirmDelete =
+      confirm(
+        'Delete this guard?'
+      );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+
+      await deleteGuard(id);
+
+      loadGuards();
+
+    } catch (error) {
+
+      console.error(error);
+    }
   };
 
-  // Filter guards by search
-  const filteredGuards = guards.filter((g) => {
-    const q = search.toLowerCase();
-    return (
-      g.id.toLowerCase().includes(q) ||
-      g.name.toLowerCase().includes(q) ||
-      g.mac_address.toLowerCase().includes(q)
-    );
-  });
-
   return (
-    <div className="space-y-6 text-white">
 
-      {/* Header */}
+    <div className="space-y-6">
+
+      {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-bold">Security Guards</h1>
-        <p className="text-sm text-gray-400">
-          Cloud-backed guard management
+
+        <h1 className="text-2xl font-bold text-white">
+
+          Guard Management
+
+        </h1>
+
+        <p className="text-gray-400 mt-1">
+
+          Manage registered guards
+          and BLE devices
+
         </p>
+
       </div>
 
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="Search by ID, Name, or MAC"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full bg-gray-900 border border-gray-800 p-3 rounded-lg"
-      />
+      {/* FORM */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
 
-      {/* Add / Edit Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="grid md:grid-cols-2 gap-4 bg-gray-900 p-6 rounded-xl border border-gray-800"
-      >
-        <input
-          type="text"
-          placeholder="Guard ID"
-          value={form.id}
-          disabled={isEditing}
-          onChange={(e) => setForm({ ...form, id: e.target.value })}
-          className="bg-gray-800 p-3 rounded"
-          required
-        />
+        <div className="grid md:grid-cols-4 gap-4">
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          className="bg-gray-800 p-3 rounded"
-          required
-        />
+          <input
+            type="text"
+            name="id"
+            placeholder="Guard ID"
+            value={formData.id}
+            onChange={handleChange}
+            className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
+          />
 
-        <input
-          type="text"
-          placeholder="MAC Address"
-          value={form.mac_address}
-          onChange={(e) => setForm({ ...form, mac_address: e.target.value })}
-          className="bg-gray-800 p-3 rounded"
-          required
-        />
+          <input
+            type="text"
+            name="name"
+            placeholder="Guard Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
+          />
 
-        <input
-          type="text"
-          placeholder="Mobile (optional)"
-          value={form.mobile_number}
-          onChange={(e) =>
-            setForm({ ...form, mobile_number: e.target.value })
-          }
-          className="bg-gray-800 p-3 rounded"
-        />
+          <input
+            type="text"
+            name="mac_address"
+            placeholder="BLE MAC Address"
+            value={formData.mac_address}
+            onChange={handleChange}
+            className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
+          />
 
-        <button
-          type="submit"
-          className={`md:col-span-2 p-3 rounded text-white ${
-            isEditing ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-        >
-          {isEditing ? 'Update Guard' : 'Add Guard'}
-        </button>
-      </form>
+          <input
+            type="text"
+            name="mobile_number"
+            placeholder="Mobile Number"
+            value={formData.mobile_number}
+            onChange={handleChange}
+            className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
+          />
 
-      {/* Guards Table */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div className="p-5 border-b border-gray-800">
-          <h2 className="font-semibold">
-            Registered Guards ({filteredGuards.length})
-          </h2>
         </div>
 
-        <table className="w-full text-sm">
-          <thead className="bg-gray-800 text-gray-400">
+        <div className="mt-4 flex gap-3">
+
+          {editingId ? (
+
+            <>
+              <button
+                onClick={handleUpdate}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
+              >
+
+                <Save className="w-4 h-4" />
+
+                Update Guard
+
+              </button>
+
+              <button
+                onClick={() => {
+
+                  setEditingId(null);
+
+                  setFormData({
+                    id: '',
+                    name: '',
+                    mac_address: '',
+                    mobile_number: '',
+                  });
+
+                }}
+
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white"
+              >
+
+                <X className="w-4 h-4" />
+
+                Cancel
+
+              </button>
+            </>
+
+          ) : (
+
+            <button
+              onClick={handleAdd}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+            >
+
+              <Plus className="w-4 h-4" />
+
+              Add Guard
+
+            </button>
+
+          )}
+
+        </div>
+
+      </div>
+
+      {/* TABLE */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+
+        <table className="w-full">
+
+          <thead className="bg-gray-800">
+
             <tr>
-              <th className="p-3 text-left">ID</th>
-              <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">MAC</th>
-              <th className="p-3 text-left">Mobile</th>
-              <th className="p-3 text-left">Actions</th>
+
+              <th className="px-5 py-3 text-left text-xs text-gray-400 uppercase">
+                ID
+              </th>
+
+              <th className="px-5 py-3 text-left text-xs text-gray-400 uppercase">
+                Name
+              </th>
+
+              <th className="px-5 py-3 text-left text-xs text-gray-400 uppercase">
+                MAC Address
+              </th>
+
+              <th className="px-5 py-3 text-left text-xs text-gray-400 uppercase">
+                Mobile
+              </th>
+
+              <th className="px-5 py-3 text-left text-xs text-gray-400 uppercase">
+                Actions
+              </th>
+
             </tr>
+
           </thead>
 
-          <tbody>
-            {filteredGuards.map((g) => (
-              <tr key={g.id} className="border-t border-gray-800">
-                <td className="p-3">{g.id}</td>
-                <td className="p-3">{g.name}</td>
-                <td className="p-3 font-mono text-gray-300">{g.mac_address}</td>
-                <td className="p-3 text-gray-300">{g.mobile_number || '--'}</td>
-                <td className="p-3 flex gap-3">
-                  <button
-                    onClick={() => handleEdit(g)}
-                    className="text-yellow-400 hover:text-yellow-600"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(g.id)}
-                    className="text-red-400 hover:text-red-600"
-                  >
-                    Delete
-                  </button>
+          <tbody className="divide-y divide-gray-800">
+
+            {loading ? (
+
+              <tr>
+
+                <td
+                  colSpan={5}
+                  className="text-center py-10 text-gray-500"
+                >
+
+                  Loading guards...
+
                 </td>
+
               </tr>
-            ))}
+
+            ) : guards.length === 0 ? (
+
+              <tr>
+
+                <td
+                  colSpan={5}
+                  className="text-center py-10 text-gray-500"
+                >
+
+                  No guards found
+
+                </td>
+
+              </tr>
+
+            ) : (
+
+              guards.map((guard) => (
+
+                <tr
+                  key={guard.id}
+                  className="hover:bg-gray-800/50"
+                >
+
+                  <td className="px-5 py-4 text-white">
+                    {guard.id}
+                  </td>
+
+                  <td className="px-5 py-4 text-white">
+                    {guard.name}
+                  </td>
+
+                  <td className="px-5 py-4 text-gray-300 font-mono">
+                    {guard.mac_address}
+                  </td>
+
+                  <td className="px-5 py-4 text-gray-300">
+                    {guard.mobile_number}
+                  </td>
+
+                  <td className="px-5 py-4 flex gap-2">
+
+                    <button
+                      onClick={() =>
+                        handleEdit(guard)
+                      }
+
+                      className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+
+                      <Pencil className="w-4 h-4" />
+
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        handleDelete(
+                          guard.id
+                        )
+                      }
+
+                      className="p-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
+                    >
+
+                      <Trash2 className="w-4 h-4" />
+
+                    </button>
+
+                  </td>
+
+                </tr>
+              ))
+            )}
+
           </tbody>
+
         </table>
+
       </div>
+
     </div>
   );
 }
