@@ -1,6 +1,6 @@
-import { supabase } from '../services/supabase';
 import { useEffect, useState } from 'react';
 
+import { supabase } from '../services/supabase';
 import { fetchPatrolEvents } from '../data/api';
 import StatusBadge from '../components/StatusBadge';
 import type { PatrolEvent } from '../types';
@@ -13,26 +13,60 @@ export default function History() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
+    // =========================
+    // INITIAL LOAD
+    // =========================
     async function loadEvents() {
       try {
         const data = await fetchPatrolEvents();
-        setEvents(data);
+        if (mounted) setEvents(data);
       } catch (error) {
         console.error('Failed to load patrol events:', error);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
     loadEvents();
+
+    // =========================
+    // REAL-TIME SUBSCRIPTION
+    // =========================
+    const channel = supabase
+      .channel('patrol_logs_realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'patrol_logs',
+        },
+        async () => {
+          const updated = await fetchPatrolEvents();
+          if (mounted) setEvents(updated);
+        }
+      )
+      .subscribe();
+
+    // cleanup
+    return () => {
+      mounted = false;
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  // ✅ SAFE checkpoint list (avoids undefined crash)
+  // =========================
+  // SAFE CHECKPOINT LIST
+  // =========================
   const checkpoints = Array.from(
     new Set(events.map((e) => e.checkpoint).filter(Boolean))
   );
 
-  // ✅ SAFE filtering (prevents runtime crash if API sends bad data)
+  // =========================
+  // FILTERING
+  // =========================
   const filtered = events.filter((e) => {
     const guardName = e.guardName ?? '';
     const guardId = e.guardId ?? '';
@@ -53,13 +87,16 @@ export default function History() {
     return matchSearch && matchStatus && matchCP;
   });
 
+  // =========================
+  // UI
+  // =========================
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-bold text-white">
-        Patrol History
+        Patrol History (Live)
       </h1>
 
-      {/* Filters */}
+      {/* FILTERS */}
       <div className="flex flex-wrap gap-3">
 
         <input
@@ -93,9 +130,10 @@ export default function History() {
             </option>
           ))}
         </select>
+
       </div>
 
-      {/* Table */}
+      {/* TABLE */}
       <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
         <table className="w-full text-sm">
 
