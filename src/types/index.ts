@@ -1,37 +1,89 @@
+// ==========================================
+// GUARD TYPE
+// ==========================================
+export interface SecurityGuard {
+
+  id: string;
+
+  name: string;
+
+  mac_address: string;
+
+  mobile_number: string;
+}
+
+// ==========================================
+// PATROL LOG TYPE
+// ==========================================
+export interface PatrolLog {
+
+  id?: string;
+
+  created_at?: string;
+
+  mac_address: string;
+
+  device_name: string;
+
+  rssi: number;
+
+  esp32_location: string;
+}
+
+// ==========================================
+// DASHBOARD EVENT TYPE
+// ==========================================
+export interface PatrolEvent {
+
+  id: string;
+
+  created_at: string;
+
+  mac_address: string;
+
+  device_name: string;
+
+  rssi: number;
+
+  esp32_location: string;
+}
+
+// ==========================================
+// DASHBOARD STATS TYPE
+// ==========================================
+export interface DashboardStats {
+
+  totalLogs: number;
+
+  totalGuards: number;
+
+  activeLocations: number;
+
+  averageRSSI: number;
+}
+
+// ==========================================
+// FILTER TYPE
+// ==========================================
+export interface PatrolFilters {
+
+  guardMac?: string;
+
+  location?: string;
+}
+
+// ==========================================
+// RSSI STATUS TYPE
+// ==========================================
+export type SignalStatus =
+  | 'strong'
+  | 'medium'
+  | 'weak';
+
+// ==========================================
+// GUARD STATUS TYPE
+// ==========================================
 export type GuardStatus =
   | 'active'
-  | 'offline'
-  | 'delayed';
-
-export interface PatrolEvent {
-  id: string;
-  guardId: string;
-  guardName: string;
-  checkpoint: string;
-  time: string;
-  rssi: number;
-  status: GuardStatus;
-}
-
-export interface Guard {
-  id: string;
-  name: string;
-  status: GuardStatus;
-  checkpoint: string;
-  lastSeen: string;
-}
-
-export interface AttendanceRecord {
-  id: number;
-  guard_name: string;
-  check_in: string;
-  check_out?: string;
-  status: string;
-}
-export interface SecurityGuard {
-  id: string;
-  name: string;
-  mac_address: string;
-  mobile_number?: string;
-  created_at?: string;
-}
+  | 'delayed'
+  | 'offline';
